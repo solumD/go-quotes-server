@@ -11,6 +11,7 @@ const (
 	levelProd  = "prod"
 )
 
+// InitLogger initializes the slog logger.
 func InitLogger(loggerLevel string) *slog.Logger {
 	var log *slog.Logger
 
@@ -37,10 +38,11 @@ func InitLogger(loggerLevel string) *slog.Logger {
 			),
 		)
 	}
-	
+
 	return log
 }
 
+// Err returns an error attribute.
 func Err(err error) slog.Attr {
 	return slog.Attr{
 		Key:   "error",

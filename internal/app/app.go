@@ -22,6 +22,7 @@ const (
 	serverIdleTimeOut  = 60 * time.Second
 )
 
+// InitAndRun initializes the application and runs it.
 func InitAndRun(ctx context.Context) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -63,7 +64,7 @@ func InitAndRun(ctx context.Context) {
 	router.HandleFunc("/quotes/{id}", handler.DeleteQuote(ctx, logger)).Methods("DELETE")
 	logger.Info("initialized routes")
 
-	srv := &http.Server{
+	server := &http.Server{
 		Addr:         cfg.ServerAddr(),
 		Handler:      router,
 		ReadTimeout:  serverReadTimeOut,
@@ -72,7 +73,7 @@ func InitAndRun(ctx context.Context) {
 	}
 
 	go func() {
-		if err := srv.ListenAndServe(); err != nil {
+		if err := server.ListenAndServe(); err != nil {
 			logger.Error("failed to start server", sl.Err(err))
 		}
 	}()
@@ -81,7 +82,7 @@ func InitAndRun(ctx context.Context) {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	<-c
-	srv.Shutdown(ctx)
+	server.Shutdown(ctx)
 	logger.Info("shutting down")
 	os.Exit(0)
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/solumD/go-quotes-server/internal/model"
 )
 
+// Service is an interface that defines the methods that a service must implement.
 type Service interface {
 	SaveQuote(ctx context.Context, quoteText string, quoteAuthor string) (int64, error)
 	GetAllQuotes(ctx context.Context) ([]*model.Quote, error)

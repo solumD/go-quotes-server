@@ -16,14 +16,16 @@ const (
 	envServerPort  = "SERVER_PORT"
 )
 
-type Config struct {
+// config is a struct that contains the configuration for the server.
+type config struct {
 	loggerLevel string
 	postgresDSN string
 	serverHost  string
 	serverPort  string
 }
 
-func MustLoad() *Config {
+// MustLoad loads the config from the .env file.
+func MustLoad() *config {
 	err := godotenv.Load(configPath)
 	if err != nil {
 		log.Fatalf("failed to load %s: %v", configPath, err)
@@ -49,7 +51,7 @@ func MustLoad() *Config {
 		log.Fatal("server port not found")
 	}
 
-	return &Config{
+	return &config{
 		loggerLevel: logLevel,
 		postgresDSN: pgDSN,
 		serverHost:  srvHost,
@@ -57,14 +59,17 @@ func MustLoad() *Config {
 	}
 }
 
-func (cfg *Config) LoggerLevel() string {
+// LoggerLevel returns the logger level.
+func (cfg *config) LoggerLevel() string {
 	return cfg.loggerLevel
 }
 
-func (cfg *Config) PostgresDSN() string {
+// PostgresDSN returns the DSN for the Postgres database connection.
+func (cfg *config) PostgresDSN() string {
 	return cfg.postgresDSN
 }
 
-func (cfg *Config) ServerAddr() string {
+// ServerAddr returns the server address by combining the server host and port.
+func (cfg *config) ServerAddr() string {
 	return net.JoinHostPort(cfg.serverHost, cfg.serverPort)
 }

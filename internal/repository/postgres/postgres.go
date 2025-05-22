@@ -11,10 +11,12 @@ import (
 	"github.com/solumD/go-quotes-server/internal/repository"
 )
 
+// repo is a struct that contains the database connection.
 type repo struct {
 	db *pgxpool.Pool
 }
 
+// New returns a new repository.
 func New(ctx context.Context, path string) (repository.Repository, error) {
 	db, err := pgxpool.New(ctx, path)
 	if err != nil {
@@ -26,10 +28,12 @@ func New(ctx context.Context, path string) (repository.Repository, error) {
 	}, nil
 }
 
+// Close closes the database connection.
 func (r *repo) Close() {
 	r.db.Close()
 }
 
+// SaveQuote saves a quote in the database.
 func (r *repo) SaveQuote(ctx context.Context, quoteText string, quoteAuthor string) (int64, error) {
 	var fn = "repo.SaveQuote"
 
@@ -44,6 +48,7 @@ func (r *repo) SaveQuote(ctx context.Context, quoteText string, quoteAuthor stri
 	return id, nil
 }
 
+// GetAllQuotes returns all quotes from the database.
 func (r *repo) GetAllQuotes(ctx context.Context) ([]*model.Quote, error) {
 	var fn = "repo.GetAllQuotes"
 
@@ -68,6 +73,7 @@ func (r *repo) GetAllQuotes(ctx context.Context) ([]*model.Quote, error) {
 	return quotes, nil
 }
 
+// GetRandomQuote returns a random quote from the database.
 func (r *repo) GetRandomQuote(ctx context.Context) (*model.Quote, error) {
 	var fn = "repo.GetRandomQuote"
 
@@ -82,6 +88,7 @@ func (r *repo) GetRandomQuote(ctx context.Context) (*model.Quote, error) {
 	return &quote, nil
 }
 
+// GetQuotesByAuthor returns quotes by author from the database.
 func (r *repo) GetQuotesByAuthor(ctx context.Context, quoteAuthor string) ([]*model.Quote, error) {
 	var fn = "repo.GetQuotesByAuthor"
 
@@ -115,6 +122,7 @@ func (r *repo) GetQuotesByAuthor(ctx context.Context, quoteAuthor string) ([]*mo
 	return quotes, nil
 }
 
+// DeleteQuote deletes a quote from the database.
 func (r *repo) DeleteQuote(ctx context.Context, quoteID int64) error {
 	var fn = "repo.DeleteQuote"
 
@@ -137,6 +145,7 @@ func (r *repo) DeleteQuote(ctx context.Context, quoteID int64) error {
 	return nil
 }
 
+// isQuoteExists checks if a quote exists in the database.
 func (r *repo) isQuoteExists(ctx context.Context, quoteID int64) (bool, error) {
 	var fn = "repo.IsQuoteExists"
 
@@ -155,6 +164,7 @@ func (r *repo) isQuoteExists(ctx context.Context, quoteID int64) (bool, error) {
 	return true, nil
 }
 
+// isAuthorExists checks if a quote author exists in the database.
 func (r *repo) isAuthorExists(ctx context.Context, quoteAuthor string) (bool, error) {
 	var fn = "repo.IsAuthorExists"
 

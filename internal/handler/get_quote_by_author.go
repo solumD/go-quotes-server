@@ -10,11 +10,12 @@ import (
 	"github.com/solumD/go-quotes-server/internal/model"
 )
 
-type GetQuotesByAuthorResponse struct {
+type getQuotesByAuthorResponse struct {
 	Quotes   []*model.Quote `json:"quotes"`
 	ErrorMsg string         `json:"error_msg,omitempty"`
 }
 
+// GetQuotesByAuthor returns quotes by author.
 func (h *handler) GetQuotesByAuthor(ctx context.Context, logger *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var fn = "handler.GetQuotesByAuthor"
@@ -29,7 +30,7 @@ func (h *handler) GetQuotesByAuthor(ctx context.Context, logger *slog.Logger) ht
 			logger.Error("failed to get quotes by author", sl.Err(err))
 
 			w.WriteHeader(http.StatusInternalServerError)
-			data, err := json.Marshal(GetQuotesByAuthorResponse{ErrorMsg: "failed to get quotes by author"})
+			data, err := json.Marshal(getQuotesByAuthorResponse{ErrorMsg: "failed to get quotes by author"})
 			if err != nil {
 				logger.Error("failed to marshal response", sl.Err(err))
 				return
@@ -40,12 +41,12 @@ func (h *handler) GetQuotesByAuthor(ctx context.Context, logger *slog.Logger) ht
 		}
 
 		w.WriteHeader(http.StatusOK)
-		data, err := json.Marshal(GetQuotesByAuthorResponse{Quotes: quotes})
+		data, err := json.Marshal(getQuotesByAuthorResponse{Quotes: quotes})
 		if err != nil {
 			logger.Error("failed to marshal response", sl.Err(err))
 			return
 		}
-		
+
 		w.Write(data)
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// NewMWLogger returns a middleware that logs requests.
 func NewMWLogger(log *slog.Logger) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		log := log.With(
