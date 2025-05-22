@@ -7,9 +7,9 @@ import (
 )
 
 type Repository interface {
-	SaveQuote(ctx context.Context, quote string, author string) (int64, error)
+	SaveQuote(ctx context.Context, quoteText string, quoteAuthor string) (int64, error)
 	GetAllQuotes(ctx context.Context) ([]*model.Quote, error)
 	GetRandomQuote(ctx context.Context) (*model.Quote, error)
-	GetQuotesByAuthor(ctx context.Context, author string) ([]*model.Quote, error)
-	DeleteQuote(ctx context.Context, id int64) error
+	GetQuotesByAuthor(ctx context.Context, quoteAuthor string) ([]*model.Quote, error)
+	DeleteQuote(ctx context.Context, ID int64) error
 }
