@@ -12,4 +12,5 @@ type Repository interface {
 	GetRandomQuote(ctx context.Context) (*model.Quote, error)
 	GetQuotesByAuthor(ctx context.Context, quoteAuthor string) ([]*model.Quote, error)
 	DeleteQuote(ctx context.Context, ID int64) error
+	Close()
 }

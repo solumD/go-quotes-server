@@ -3,6 +3,7 @@ module github.com/solumD/go-quotes-server
 go 1.24.0
 
 require (
+	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	golang.org/x/sync v0.13.0 // indirect

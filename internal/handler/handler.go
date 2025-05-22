@@ -1,9 +1,14 @@
 package handler
 
-import "github.com/solumD/go-quotes-server/internal/service"
+import (
+	"encoding/json"
+
+	"github.com/solumD/go-quotes-server/internal/service"
+)
 
 type handler struct {
 	service service.Service
+	decoder json.Decoder
 }
 
 func New(service service.Service) *handler {
@@ -11,3 +16,5 @@ func New(service service.Service) *handler {
 		service: service,
 	}
 }
+
+
