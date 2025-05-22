@@ -21,7 +21,6 @@ func (h *handler) GetRandomQuote(ctx context.Context, logger *slog.Logger) http.
 
 		logger = logger.With(
 			slog.String("fn", fn),
-			slog.String("request_id", r.Header.Get("X-Request-ID")),
 		)
 
 		quote, err := h.service.GetRandomQuote(ctx)

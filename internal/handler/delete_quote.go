@@ -5,13 +5,11 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
+	"strconv"
 
+	"github.com/gorilla/mux"
 	"github.com/solumD/go-quotes-server/internal/lib/sl"
 )
-
-type DeleteQuoteRequest struct {
-	ID int64 `json:"id"`
-}
 
 type DeleteQuoteResponse struct {
 	ErrorMsg string `json:"error,omitempty"`
@@ -23,15 +21,13 @@ func (h *handler) DeleteQuote(ctx context.Context, logger *slog.Logger) http.Han
 
 		logger = logger.With(
 			slog.String("fn", fn),
-			slog.String("request_id", r.Header.Get("X-Request-ID")),
 		)
 
-		var req DeleteQuoteRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			logger.Error("failed to decode request", sl.Err(err))
-
+		id, err := strconv.Atoi(mux.Vars(r)["id"])
+		if err != nil {
+			logger.Error("failed to get quote id", sl.Err(err))
 			w.WriteHeader(http.StatusBadRequest)
-			data, err := json.Marshal(DeleteQuoteResponse{ErrorMsg: "failed to decode request"})
+			data, err := json.Marshal(DeleteQuoteResponse{ErrorMsg: "failed to delete quote"})
 			if err != nil {
 				logger.Error("failed to marshal response", sl.Err(err))
 				return
@@ -41,7 +37,7 @@ func (h *handler) DeleteQuote(ctx context.Context, logger *slog.Logger) http.Han
 			return
 		}
 
-		err := h.service.DeleteQuote(ctx, req.ID)
+		err = h.service.DeleteQuote(ctx, int64(id))
 		if err != nil {
 			logger.Error("failed to delete quote", sl.Err(err))
 

@@ -21,7 +21,6 @@ func (h *handler) GetQuotesByAuthor(ctx context.Context, logger *slog.Logger) ht
 
 		logger = logger.With(
 			slog.String("fn", fn),
-			slog.String("request_id", r.Header.Get("X-Request-ID")),
 		)
 
 		author := r.URL.Query().Get("author")
@@ -46,7 +45,7 @@ func (h *handler) GetQuotesByAuthor(ctx context.Context, logger *slog.Logger) ht
 			logger.Error("failed to marshal response", sl.Err(err))
 			return
 		}
-
+		
 		w.Write(data)
 	}
 }

@@ -21,7 +21,6 @@ func (h *handler) GetAllQuotes(ctx context.Context, logger *slog.Logger) http.Ha
 
 		logger = logger.With(
 			slog.String("fn", fn),
-			slog.String("request_id", r.Header.Get("X-Request-ID")),
 		)
 
 		quotes, err := h.service.GetAllQuotes(ctx)
@@ -45,7 +44,7 @@ func (h *handler) GetAllQuotes(ctx context.Context, logger *slog.Logger) http.Ha
 			logger.Error("failed to marshal response", sl.Err(err))
 			return
 		}
-
+		
 		w.Write(data)
 	}
 }

@@ -10,8 +10,8 @@ import (
 )
 
 type SaveQuoteRequest struct {
-	QuoteText   string `json:"quote"`
 	QuoteAuthor string `json:"author"`
+	QuoteText   string `json:"quote"`
 }
 
 type SaveQuoteResponse struct {
@@ -25,7 +25,6 @@ func (h *handler) SaveQuote(ctx context.Context, logger *slog.Logger) http.Handl
 
 		logger = logger.With(
 			slog.String("fn", fn),
-			slog.String("request_id", r.Header.Get("X-Request-ID")),
 		)
 
 		var req SaveQuoteRequest

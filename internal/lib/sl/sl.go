@@ -37,6 +37,7 @@ func InitLogger(loggerLevel string) *slog.Logger {
 			),
 		)
 	}
+	
 	return log
 }
 
