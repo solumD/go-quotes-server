@@ -59,7 +59,7 @@ func InitAndRun(ctx context.Context) {
 			handler.GetAllQuotes(ctx, logger)(w, r)
 		}
 	}).Methods("GET")
-	router.HandleFunc("/quotes", handler.GetAllQuotes(ctx, logger)).Methods("GET")
+	router.HandleFunc("/quotes", handler.SaveQuote(ctx, logger)).Methods("POST")
 	router.HandleFunc("/quotes/random", handler.GetRandomQuote(ctx, logger)).Methods("GET")
 	router.HandleFunc("/quotes/{id}", handler.DeleteQuote(ctx, logger)).Methods("DELETE")
 	logger.Info("initialized routes")
