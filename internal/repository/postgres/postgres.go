@@ -9,6 +9,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/solumD/go-quotes-server/internal/model"
 	"github.com/solumD/go-quotes-server/internal/repository"
+	repoerrors "github.com/solumD/go-quotes-server/internal/repository/repo_errors"
 )
 
 // repo is a struct that contains the database connection.
@@ -98,7 +99,7 @@ func (r *repo) GetQuotesByAuthor(ctx context.Context, quoteAuthor string) ([]*mo
 	}
 
 	if !exist {
-		return nil, fmt.Errorf("%s: quote author does not exist", fn)
+		return nil, repoerrors.ErrAuthorNotExist
 	}
 
 	q := `SELECT id, quote_text, quote_author FROM quotes WHERE is_deleted = false AND quote_author = $1`
@@ -132,7 +133,7 @@ func (r *repo) DeleteQuote(ctx context.Context, quoteID int64) error {
 	}
 
 	if !exist {
-		return fmt.Errorf("%s: quote does not exist", fn)
+		return nil
 	}
 
 	q := "UPDATE quotes SET is_deleted = true WHERE id = $1"

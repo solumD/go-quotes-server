@@ -2,11 +2,11 @@ package srv
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/solumD/go-quotes-server/internal/model"
 	"github.com/solumD/go-quotes-server/internal/repository"
 	"github.com/solumD/go-quotes-server/internal/service"
+	srverrors "github.com/solumD/go-quotes-server/internal/service/srv_errors"
 )
 
 // srv is a struct that contains the repository.
@@ -23,17 +23,20 @@ func New(repo repository.Repository) service.Service {
 
 // SaveQuote validates quote data and saves it in the database.
 func (s *srv) SaveQuote(ctx context.Context, quoteText string, quoteAuthor string) (int64, error) {
-	var fn = "srv.SaveQuote"
-
 	if len(quoteText) == 0 {
-		return 0, fmt.Errorf("%s: quote text is empty", fn)
+		return 0, srverrors.ErrTextIsEmpty
 	}
 
 	if len(quoteAuthor) == 0 {
-		return 0, fmt.Errorf("%s: quote author is empty", fn)
+		return 0, srverrors.ErrAuthorIsEmpty
 	}
 
-	return s.repo.SaveQuote(ctx, quoteText, quoteAuthor)
+	id, err := s.repo.SaveQuote(ctx, quoteText, quoteAuthor)
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
 }
 
 // GetAllQuotes returns all quotes from the database.
@@ -43,25 +46,38 @@ func (s *srv) GetAllQuotes(ctx context.Context) ([]*model.Quote, error) {
 
 // GetRandomQuote returns a random quote from the database.
 func (s *srv) GetRandomQuote(ctx context.Context) (*model.Quote, error) {
-	return s.repo.GetRandomQuote(ctx)
+	quote, err := s.repo.GetRandomQuote(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return quote, nil
 }
 
 // GetQuotesByAuthor validates quote author and returns quotes by this author from the database.
 func (s *srv) GetQuotesByAuthor(ctx context.Context, quoteAuthor string) ([]*model.Quote, error) {
-	var fn = "srv.GetQuotesByAuthor"
 	if len(quoteAuthor) == 0 {
-		return nil, fmt.Errorf("%s: quote author is empty", fn)
+		return nil, srverrors.ErrAuthorIsEmpty
 	}
 
-	return s.repo.GetQuotesByAuthor(ctx, quoteAuthor)
+	quotes, err := s.repo.GetQuotesByAuthor(ctx, quoteAuthor)
+	if err != nil {
+		return nil, err
+	}
+
+	return quotes, nil
 }
 
 // DeleteQuote deletes a quote from the database.
 func (s *srv) DeleteQuote(ctx context.Context, id int64) error {
-	var fn = "srv.DeleteQuote"
 	if id <= 0 {
-		return fmt.Errorf("%s: quote id is invalid", fn)
+		return srverrors.ErrInvalidID
 	}
 
-	return s.repo.DeleteQuote(ctx, id)
+	err := s.repo.DeleteQuote(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/solumD/go-quotes-server/internal/lib/sl"
+	srverrors "github.com/solumD/go-quotes-server/internal/service/srv_errors"
 )
 
 type saveQuoteRequest struct {
@@ -48,7 +49,15 @@ func (h *handler) SaveQuote(ctx context.Context, logger *slog.Logger) http.Handl
 			logger.Error("failed to save quote", sl.Err(err))
 
 			w.WriteHeader(http.StatusInternalServerError)
-			data, err := json.Marshal(saveQuoteResponse{ErrorMsg: "failed to save quote"})
+
+			var resp saveQuoteResponse
+			if err == srverrors.ErrTextIsEmpty || err == srverrors.ErrAuthorIsEmpty {
+				resp.ErrorMsg = err.Error()
+			} else {
+				resp.ErrorMsg = "failed to save quote"
+			}
+
+			data, err := json.Marshal(resp)
 			if err != nil {
 				logger.Error("failed to marshal response", sl.Err(err))
 				return
