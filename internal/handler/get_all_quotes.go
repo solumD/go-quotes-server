@@ -10,7 +10,8 @@ import (
 	"github.com/solumD/go-quotes-server/internal/model"
 )
 
-type getAllQuotesResponse struct {
+// GetAllQuotesResponse is a struct of the response.
+type GetAllQuotesResponse struct {
 	Quotes   []*model.Quote `json:"quotes"`
 	ErrorMsg string         `json:"error_msg,omitempty"`
 }
@@ -29,9 +30,9 @@ func (h *handler) GetAllQuotes(ctx context.Context, logger *slog.Logger) http.Ha
 			logger.Error("failed to get all quotes", sl.Err(err))
 
 			w.WriteHeader(http.StatusInternalServerError)
-			data, err := json.Marshal(getAllQuotesResponse{ErrorMsg: "failed to get all quotes"})
+			data, err := json.Marshal(GetAllQuotesResponse{ErrorMsg: "failed to get all quotes"})
 			if err != nil {
-				logger.Error("failed to marshal response", sl.Err(err))
+				logger.Error(ErrMarshalResponse.Error(), sl.Err(err))
 				return
 			}
 
@@ -40,9 +41,9 @@ func (h *handler) GetAllQuotes(ctx context.Context, logger *slog.Logger) http.Ha
 		}
 
 		w.WriteHeader(http.StatusOK)
-		data, err := json.Marshal(getAllQuotesResponse{Quotes: quotes})
+		data, err := json.Marshal(GetAllQuotesResponse{Quotes: quotes})
 		if err != nil {
-			logger.Error("failed to marshal response", sl.Err(err))
+			logger.Error(ErrMarshalResponse.Error(), sl.Err(err))
 			return
 		}
 

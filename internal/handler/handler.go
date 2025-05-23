@@ -1,7 +1,16 @@
 package handler
 
 import (
+	"errors"
+
 	"github.com/solumD/go-quotes-server/internal/service"
+)
+
+var (
+	// ErrUnmarshalRequest is an error that is returned when the request is not unmarshaled.
+	ErrUnmarshalRequest = errors.New("failed to unmarshal request")
+	// ErrMarshalResponse is an error that is returned when the response is not marshaled.
+	ErrMarshalResponse = errors.New("failed to marshal response")
 )
 
 // handler is a struct that contains the service and handler functions.

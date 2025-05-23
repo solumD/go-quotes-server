@@ -10,12 +10,14 @@ import (
 	srverrors "github.com/solumD/go-quotes-server/internal/service/srv_errors"
 )
 
-type saveQuoteRequest struct {
+// SaveQuoteRequest is a struct of the request.
+type SaveQuoteRequest struct {
 	QuoteAuthor string `json:"author"`
 	QuoteText   string `json:"quote"`
 }
 
-type saveQuoteResponse struct {
+// SaveQuoteResponse is a struct of the response.
+type SaveQuoteResponse struct {
 	ID       int64  `json:"id,omitempty"`
 	ErrorMsg string `json:"error,omitempty"`
 }
@@ -29,14 +31,14 @@ func (h *handler) SaveQuote(ctx context.Context, logger *slog.Logger) http.Handl
 			slog.String("fn", fn),
 		)
 
-		var req saveQuoteRequest
+		var req SaveQuoteRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			logger.Error("failed to decode request", sl.Err(err))
+			logger.Error(ErrUnmarshalRequest.Error(), sl.Err(err))
 
 			w.WriteHeader(http.StatusBadRequest)
-			data, err := json.Marshal(saveQuoteResponse{ErrorMsg: "failed to decode request"})
+			data, err := json.Marshal(SaveQuoteResponse{ErrorMsg: ErrUnmarshalRequest.Error()})
 			if err != nil {
-				logger.Error("failed to marshal response", sl.Err(err))
+				logger.Error(ErrMarshalResponse.Error(), sl.Err(err))
 				return
 			}
 
@@ -48,18 +50,18 @@ func (h *handler) SaveQuote(ctx context.Context, logger *slog.Logger) http.Handl
 		if err != nil {
 			logger.Error("failed to save quote", sl.Err(err))
 
-			w.WriteHeader(http.StatusInternalServerError)
-
-			var resp saveQuoteResponse
+			var resp SaveQuoteResponse
 			if err == srverrors.ErrTextIsEmpty || err == srverrors.ErrAuthorIsEmpty || err == srverrors.ErrTextAndAuthorEmpty {
+				w.WriteHeader(http.StatusBadRequest)
 				resp.ErrorMsg = err.Error()
 			} else {
+				w.WriteHeader(http.StatusInternalServerError)
 				resp.ErrorMsg = "failed to save quote"
 			}
 
 			data, err := json.Marshal(resp)
 			if err != nil {
-				logger.Error("failed to marshal response", sl.Err(err))
+				logger.Error(ErrMarshalResponse.Error(), sl.Err(err))
 				return
 			}
 
@@ -68,9 +70,9 @@ func (h *handler) SaveQuote(ctx context.Context, logger *slog.Logger) http.Handl
 		}
 
 		w.WriteHeader(http.StatusOK)
-		data, err := json.Marshal(saveQuoteResponse{ID: id})
+		data, err := json.Marshal(SaveQuoteResponse{ID: id})
 		if err != nil {
-			logger.Error("failed to marshal response", sl.Err(err))
+			logger.Error(ErrMarshalResponse.Error(), sl.Err(err))
 			return
 		}
 

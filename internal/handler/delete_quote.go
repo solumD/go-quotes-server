@@ -3,15 +3,23 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"log/slog"
 	"net/http"
 	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/solumD/go-quotes-server/internal/lib/sl"
+	srverrors "github.com/solumD/go-quotes-server/internal/service/srv_errors"
 )
 
-type deleteQuoteResponse struct {
+var (
+	// ErrFailedToGetQuoteID is an error that is returned when the quote id is not found.
+	ErrFailedToGetQuoteID = errors.New("failed to get quote id")
+)
+
+// DeleteQuoteResponse is a struct of the response.
+type DeleteQuoteResponse struct {
 	ErrorMsg string `json:"error,omitempty"`
 }
 
@@ -28,9 +36,9 @@ func (h *handler) DeleteQuote(ctx context.Context, logger *slog.Logger) http.Han
 		if err != nil {
 			logger.Error("failed to get quote id", sl.Err(err))
 			w.WriteHeader(http.StatusBadRequest)
-			data, err := json.Marshal(deleteQuoteResponse{ErrorMsg: "failed to delete quote"})
+			data, err := json.Marshal(DeleteQuoteResponse{ErrorMsg: ErrFailedToGetQuoteID.Error()})
 			if err != nil {
-				logger.Error("failed to marshal response", sl.Err(err))
+				logger.Error(ErrMarshalResponse.Error(), sl.Err(err))
 				return
 			}
 
@@ -42,10 +50,18 @@ func (h *handler) DeleteQuote(ctx context.Context, logger *slog.Logger) http.Han
 		if err != nil {
 			logger.Error("failed to delete quote", sl.Err(err))
 
-			w.WriteHeader(http.StatusInternalServerError)
-			data, err := json.Marshal(deleteQuoteResponse{ErrorMsg: "failed to delete quote"})
+			var resp DeleteQuoteResponse
+			if err == srverrors.ErrInvalidID {
+				w.WriteHeader(http.StatusBadRequest)
+				resp.ErrorMsg = err.Error()
+			} else {
+				w.WriteHeader(http.StatusInternalServerError)
+				resp.ErrorMsg = "failed to delete quote"
+			}
+
+			data, err := json.Marshal(resp)
 			if err != nil {
-				logger.Error("failed to marshal response", sl.Err(err))
+				logger.Error(ErrMarshalResponse.Error(), sl.Err(err))
 				return
 			}
 
@@ -54,9 +70,9 @@ func (h *handler) DeleteQuote(ctx context.Context, logger *slog.Logger) http.Han
 		}
 
 		w.WriteHeader(http.StatusOK)
-		data, err := json.Marshal(deleteQuoteResponse{})
+		data, err := json.Marshal(DeleteQuoteResponse{})
 		if err != nil {
-			logger.Error("failed to marshal response", sl.Err(err))
+			logger.Error(ErrMarshalResponse.Error(), sl.Err(err))
 			return
 		}
 

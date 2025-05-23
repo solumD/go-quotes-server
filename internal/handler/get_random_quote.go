@@ -10,8 +10,9 @@ import (
 	"github.com/solumD/go-quotes-server/internal/model"
 )
 
-type getRandomQuoteResponse struct {
-	Quote    *model.Quote `json:"quote"`
+// GetRandomQuoteResponse is a struct of the response.
+type GetRandomQuoteResponse struct {
+	Quote    *model.Quote `json:"quote,omitempty"`
 	ErrorMsg string       `json:"error_msg,omitempty"`
 }
 
@@ -29,9 +30,9 @@ func (h *handler) GetRandomQuote(ctx context.Context, logger *slog.Logger) http.
 			logger.Error("failed to get random quote", sl.Err(err))
 
 			w.WriteHeader(http.StatusInternalServerError)
-			data, err := json.Marshal(getRandomQuoteResponse{ErrorMsg: "failed to get random quote"})
+			data, err := json.Marshal(GetRandomQuoteResponse{ErrorMsg: "failed to get random quote"})
 			if err != nil {
-				logger.Error("failed to marshal response", sl.Err(err))
+				logger.Error(ErrMarshalResponse.Error(), sl.Err(err))
 				return
 			}
 
@@ -40,9 +41,9 @@ func (h *handler) GetRandomQuote(ctx context.Context, logger *slog.Logger) http.
 		}
 
 		w.WriteHeader(http.StatusOK)
-		data, err := json.Marshal(getRandomQuoteResponse{Quote: quote})
+		data, err := json.Marshal(GetRandomQuoteResponse{Quote: quote})
 		if err != nil {
-			logger.Error("failed to marshal response", sl.Err(err))
+			logger.Error(ErrMarshalResponse.Error(), sl.Err(err))
 			return
 		}
 
