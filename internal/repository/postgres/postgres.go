@@ -2,10 +2,8 @@ package postgres
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
-	"github.com/jackc/pgx"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/solumD/go-quotes-server/internal/model"
 	"github.com/solumD/go-quotes-server/internal/repository"
@@ -127,42 +125,14 @@ func (r *repo) GetQuotesByAuthor(ctx context.Context, quoteAuthor string) ([]*mo
 func (r *repo) DeleteQuote(ctx context.Context, quoteID int64) error {
 	var fn = "repo.DeleteQuote"
 
-	exist, err := r.isQuoteExists(ctx, quoteID)
-	if err != nil {
-		return err
-	}
-
-	if !exist {
-		return nil
-	}
-
 	q := "UPDATE quotes SET is_deleted = true WHERE id = $1"
 
-	_, err = r.db.Exec(ctx, q, quoteID)
+	_, err := r.db.Exec(ctx, q, quoteID)
 	if err != nil {
 		return fmt.Errorf("%s: failed to delete quote: %w", fn, err)
 	}
 
 	return nil
-}
-
-// isQuoteExists checks if a quote exists in the database.
-func (r *repo) isQuoteExists(ctx context.Context, quoteID int64) (bool, error) {
-	var fn = "repo.IsQuoteExists"
-
-	q := "SELECT id FROM quotes WHERE id = $1 AND is_deleted = false"
-
-	var id int64
-	err := r.db.QueryRow(ctx, q, quoteID).Scan(&id)
-	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return false, nil
-		}
-
-		return false, fmt.Errorf("%s: failed to check if quote exists: %w", fn, err)
-	}
-
-	return true, nil
 }
 
 // isAuthorExists checks if a quote author exists in the database.
@@ -174,7 +144,7 @@ func (r *repo) isAuthorExists(ctx context.Context, quoteAuthor string) (bool, er
 	var id int64
 	err := r.db.QueryRow(ctx, q, quoteAuthor).Scan(&id)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
+		if err.Error() == "no rows in result set" {
 			return false, nil
 		}
 
