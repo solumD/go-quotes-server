@@ -23,11 +23,11 @@ func New(repo repository.Repository) service.Service {
 
 // SaveQuote validates quote data and saves it in the database.
 func (s *srv) SaveQuote(ctx context.Context, quoteText string, quoteAuthor string) (int64, error) {
-	if len(quoteText) == 0 {
+	if len(quoteText) == 0 && len(quoteAuthor) == 0 {
+		return 0, srverrors.ErrTextAndAuthorEmpty
+	} else if len(quoteText) == 0 {
 		return 0, srverrors.ErrTextIsEmpty
-	}
-
-	if len(quoteAuthor) == 0 {
+	} else if len(quoteAuthor) == 0 {
 		return 0, srverrors.ErrAuthorIsEmpty
 	}
 

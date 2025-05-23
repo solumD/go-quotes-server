@@ -51,7 +51,7 @@ func (h *handler) SaveQuote(ctx context.Context, logger *slog.Logger) http.Handl
 			w.WriteHeader(http.StatusInternalServerError)
 
 			var resp saveQuoteResponse
-			if err == srverrors.ErrTextIsEmpty || err == srverrors.ErrAuthorIsEmpty {
+			if err == srverrors.ErrTextIsEmpty || err == srverrors.ErrAuthorIsEmpty || err == srverrors.ErrTextAndAuthorEmpty {
 				resp.ErrorMsg = err.Error()
 			} else {
 				resp.ErrorMsg = "failed to save quote"
